@@ -1,0 +1,225 @@
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,400&family=DM+Mono:wght@400;500&display=swap');
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+::selection { background: #00586833; }
+
+/* --- Form Elements --- */
+input[type=text],
+input[type=number],
+select,
+textarea {
+  width: 100%;
+  padding: 10px 14px;
+  border: 1.5px solid #b0dce2;
+  border-radius: 8px;
+  font: 400 14px/1.5 'DM Sans', sans-serif;
+  color: #1a2332;
+  background: #fff;
+  transition: border-color .2s, box-shadow .2s;
+  outline: none;
+}
+input:focus, select:focus, textarea:focus {
+  border-color: #005868;
+  box-shadow: 0 0 0 3px #00586818;
+}
+input::placeholder, textarea::placeholder { color: #9cb8be; }
+
+/* --- Buttons --- */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 10px 22px;
+  border-radius: 8px;
+  font: 500 14px 'DM Sans', sans-serif;
+  cursor: pointer;
+  border: none;
+  transition: all .15s;
+}
+.bp { background: #005868; color: #fff; }
+.bp:hover { background: #003d4a; transform: translateY(-1px); box-shadow: 0 4px 12px #00586830; }
+.bs { background: #fff; color: #005868; border: 1.5px solid #b0dce2; }
+.bs:hover { border-color: #005868; background: #e4f4f6; }
+.bl { background: #D8D800; color: #003d4a; font-weight: 600; }
+.bl:hover { background: #9a9a00; color: #fff; transform: translateY(-1px); box-shadow: 0 4px 12px #D8D80040; }
+.btn:disabled { opacity: .4; cursor: not-allowed; transform: none !important; box-shadow: none !important; }
+
+/* --- Chips --- */
+.ch {
+  display: inline-flex;
+  align-items: center;
+  padding: 7px 14px;
+  border-radius: 8px;
+  font-size: 13px;
+  cursor: pointer;
+  border: 1.5px solid #b0dce2;
+  background: #fff;
+  transition: all .15s;
+  user-select: none;
+  line-height: 1.4;
+}
+.ch:hover { border-color: #005868; }
+.cha { background: #e4f4f6; border-color: #005868; color: #005868; font-weight: 500; }
+.chr { background: #fef2f2; border-color: #c0392b; color: #991b1b; font-weight: 500; }
+
+/* --- Cards --- */
+.cd {
+  background: #fff;
+  border-radius: 14px;
+  border: 1px solid #d4e8ec;
+  padding: 28px 32px;
+  margin-bottom: 20px;
+  box-shadow: 0 1px 3px #00586808;
+}
+@media (max-width: 700px) { .cd { padding: 20px 16px; } }
+
+/* --- Radio Group --- */
+.rg { display: flex; gap: 8px; flex-wrap: wrap; }
+.rp {
+  padding: 8px 18px;
+  border-radius: 8px;
+  font-size: 13px;
+  cursor: pointer;
+  border: 1.5px solid #b0dce2;
+  background: #fff;
+  transition: all .15s;
+  user-select: none;
+}
+.rp:hover { border-color: #005868; }
+.ra { background: #005868; color: #fff; border-color: #005868; }
+
+/* --- Progress Bar --- */
+.pg { height: 3px; background: #b0dce2; border-radius: 2px; overflow: hidden; }
+.pf { height: 100%; background: #D8D800; transition: width .4s; border-radius: 2px; }
+
+/* --- Step Dots --- */
+.dt {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  font-weight: 500;
+  transition: all .2s;
+  flex-shrink: 0;
+  cursor: pointer;
+}
+.dd { background: #005868; color: #fff; }
+.dc { background: #D8D800; color: #003d4a; box-shadow: 0 0 0 3px #D8D80050; }
+.df { background: #b0dce2; color: #fff; }
+
+/* --- Result Table --- */
+.rt { width: 100%; border-collapse: collapse; font-size: 14px; }
+.rt td { padding: 10px 14px; border-bottom: 1px solid #e8f0f2; vertical-align: top; }
+.rt td:first-child { font-weight: 500; color: #005868; width: 40%; }
+
+/* --- Fade In Animation --- */
+.fi { animation: fi .4s ease; }
+@keyframes fi { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: none; } }
+
+/* --- Dropzone --- */
+.dropzone {
+  border: 2px dashed #b0dce2;
+  border-radius: 14px;
+  padding: 40px 24px;
+  text-align: center;
+  transition: all .2s;
+  cursor: pointer;
+  background: #fff;
+}
+.dropzone:hover, .dropzone.over { border-color: #D8D800; background: #f5f5d0; }
+
+/* --- File Tags --- */
+.file-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  border-radius: 8px;
+  background: #e4f4f6;
+  border: 1px solid #b0dce2;
+  font-size: 13px;
+  color: #005868;
+}
+.file-rm { cursor: pointer; font-size: 16px; color: #c0392b; line-height: 1; }
+
+/* --- Source Toggles --- */
+.src-toggle {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 16px;
+  border-radius: 10px;
+  border: 1.5px solid #b0dce2;
+  background: #fff;
+  cursor: pointer;
+  transition: all .2s;
+  user-select: none;
+}
+.src-toggle:hover { border-color: #005868; }
+.src-toggle.on { border-color: #005868; background: #e4f4f6; }
+.src-toggle .track {
+  width: 36px;
+  height: 20px;
+  border-radius: 10px;
+  background: #b0dce2;
+  position: relative;
+  transition: background .2s;
+  flex-shrink: 0;
+}
+.src-toggle.on .track { background: #D8D800; }
+.src-toggle .thumb {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: #fff;
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  transition: transform .2s;
+  box-shadow: 0 1px 3px #0002;
+}
+.src-toggle.on .thumb { transform: translateX(16px); }
+
+/* --- URL Rows --- */
+.url-row { display: flex; gap: 8px; align-items: center; }
+.url-rm {
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  border: 1.5px solid #b0dce2;
+  background: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  color: #c0392b;
+  font-size: 16px;
+  flex-shrink: 0;
+  transition: all .15s;
+}
+.url-rm:hover { border-color: #c0392b; background: #fef2f2; }
+.url-add {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 13px;
+  color: #005868;
+  cursor: pointer;
+  padding: 6px 0;
+  font-weight: 500;
+}
+.url-add:hover { text-decoration: underline; }
+
+/* --- Loading Bar --- */
+.loading-bar { height: 4px; background: #b0dce2; border-radius: 2px; overflow: hidden; margin: 16px 0; }
+.loading-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #005868, #D8D800, #005868);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s linear infinite;
+  border-radius: 2px;
+}
+@keyframes shimmer { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
