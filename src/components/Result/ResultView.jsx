@@ -173,6 +173,28 @@ export default function ResultView({ data, result, onEdit }) {
         </div>
       </div>
 
+      {/* CTA */}
+      <div className="mt-12 bg-gradient-to-br from-primary to-primary-container rounded-xl p-8 text-white shadow-xl relative overflow-hidden">
+        <div className="relative z-10">
+          <h4 className="text-xl font-bold mb-2 font-headline">Benötigen Sie Hilfe oder haben Fragen zur Planung und Umsetzung von NIS-2?</h4>
+          <p className="text-white/80 text-sm mb-6">
+            Unsere Experten unterstützen Sie bei der NIS-2 Umsetzung und Zertifizierung.
+          </p>
+          <a
+            href="https://sits.group"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-2 px-6 py-3 bg-white text-primary font-bold rounded-lg hover:bg-accent transition-colors"
+          >
+            Jetzt Beratung anfragen
+            <span className="material-symbols-outlined text-sm">arrow_forward</span>
+          </a>
+        </div>
+        <div className="absolute -right-4 -bottom-4 opacity-10">
+          <span className="material-symbols-outlined text-[120px]">shield</span>
+        </div>
+      </div>
+
       {/* Legal Footer */}
       <footer className="mt-16 text-center text-on-surface-variant text-xs">
         <p>
