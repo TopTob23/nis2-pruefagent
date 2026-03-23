@@ -12,7 +12,6 @@ import StepGroesse from "./components/Steps/StepGroesse";
 import StepOeffentlich from "./components/Steps/StepOeffentlich";
 import StepKonzern from "./components/Steps/StepKonzern";
 import StepSondermerkmale from "./components/Steps/StepSondermerkmale";
-import StepErgaenzungen from "./components/Steps/StepErgaenzungen";
 import StepLieferkette from "./components/Steps/StepLieferkette";
 import ResultView from "./components/Result/ResultView";
 
@@ -54,8 +53,6 @@ export default function App() {
       case 6:
         return <StepSondermerkmale {...common} />;
       case 7:
-        return <StepErgaenzungen {...common} />;
-      case 8:
         return <StepLieferkette {...common} />;
       default:
         return null;

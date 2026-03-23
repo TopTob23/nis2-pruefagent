@@ -39,6 +39,5 @@ export const STEP_LABELS = [
   "Öffentlich",
   "Konzern",
   "Sondermerkmale",
-  "Ergänzungen",
   "Lieferkette",
 ];
