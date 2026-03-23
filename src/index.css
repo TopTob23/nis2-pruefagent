@@ -27,6 +27,123 @@
   to { opacity: 1; transform: none; }
 }
 
+/* ===== PRINT STYLES ===== */
+@media print {
+  /* Hide everything except the result */
+  body {
+    background: white !important;
+    color: #191c1e !important;
+    font-size: 11pt !important;
+    line-height: 1.5 !important;
+  }
+
+  /* Hide non-print elements */
+  header, nav, .no-print,
+  button, .mobile-nav,
+  .animate-pulse {
+    display: none !important;
+  }
+
+  /* Reset layout for print */
+  main {
+    padding: 0 !important;
+    max-width: 100% !important;
+  }
+
+  /* Force single column */
+  .grid {
+    display: block !important;
+  }
+
+  .lg\:col-span-2, .lg\:col-span-3,
+  .md\:col-span-2, .md\:col-span-8, .md\:col-span-4 {
+    width: 100% !important;
+  }
+
+  /* Result header: Inline layout */
+  section:first-child .flex {
+    gap: 24px !important;
+  }
+
+  /* Status circle: Smaller for print */
+  .relative.shrink-0 {
+    transform: scale(0.7);
+    transform-origin: top left;
+  }
+
+  /* Cards: Remove shadows, add borders */
+  .rounded-xl, .rounded-lg {
+    box-shadow: none !important;
+    border: 1px solid #e0e3e6 !important;
+    break-inside: avoid;
+    margin-bottom: 12px !important;
+  }
+
+  /* Dark cards: Invert for print */
+  .bg-primary, .bg-gradient-to-br {
+    background: white !important;
+    color: #191c1e !important;
+    border: 2px solid #005868 !important;
+  }
+  .bg-primary .text-white,
+  .bg-primary .text-white\/70,
+  .bg-primary .text-white\/80,
+  .bg-gradient-to-br .text-white,
+  .bg-gradient-to-br .text-white\/80 {
+    color: #191c1e !important;
+  }
+
+  /* Detail rows */
+  .divide-y > * {
+    border-color: #e0e3e6 !important;
+  }
+
+  /* Force text colors for print */
+  .text-primary { color: #005868 !important; }
+  .text-error { color: #ba1a1a !important; }
+  .text-secondary { color: #626200 !important; }
+  .text-on-surface-variant { color: #3f484b !important; }
+
+  /* Print header with logo and title */
+  .print-header {
+    display: flex !important;
+    align-items: center;
+    gap: 16px;
+    padding-bottom: 16px;
+    margin-bottom: 24px;
+    border-bottom: 3px solid #005868;
+  }
+  .print-header img {
+    height: 40px;
+    filter: none;
+  }
+
+  /* Print footer */
+  footer {
+    margin-top: 32px !important;
+    padding-top: 12px !important;
+    border-top: 1px solid #e0e3e6 !important;
+    font-size: 8pt !important;
+    page-break-inside: avoid;
+  }
+
+  /* Page margins */
+  @page {
+    margin: 15mm 15mm 20mm 15mm;
+    size: A4;
+  }
+
+  /* Avoid page breaks inside cards */
+  .space-y-8 > * {
+    break-inside: avoid;
+  }
+}
+
+/* Print header: Hidden on screen, visible in print */
+.print-header {
+  display: none;
+}
+
 /* Loading shimmer */
 .loading-bar {
   height: 4px;

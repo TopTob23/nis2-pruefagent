@@ -24,7 +24,7 @@ export default function StepGroesse({ data, setField }) {
               Mitarbeiteranzahl (Vollzeitäquivalente)
             </h3>
             <Field
-              label="Anzahl Mitarbeiter (VZÄ) *"
+              label="Anzahl Mitarbeiter *"
               hint="Vollzeitäquivalente gem. KMU-Empfehlung 2003/361/EG"
             >
               <Input

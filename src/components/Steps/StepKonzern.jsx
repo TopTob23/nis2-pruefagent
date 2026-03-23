@@ -41,7 +41,7 @@ export default function StepKonzern({ data, setField }) {
                   />
                 </Field>
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                  <Field label="Konzern-VZÄ">
+                  <Field label="Konzern-Mitarbeiter">
                     <Input
                       type="number"
                       value={data.konzernMA}

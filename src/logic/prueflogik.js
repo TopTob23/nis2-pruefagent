@@ -6,10 +6,10 @@ import { ANLAGE1, ANLAGE2 } from "../constants/sectors";
  * Schwellenwerte (es genügt EINE Schwelle):
  *
  * Mittleres Unternehmen (→ Wichtige Einrichtung bei Anlage 1 oder 2):
- *   ≥ 50 VZÄ ODER (Umsatz > 10 Mio. € UND Bilanz > 10 Mio. €)
+ *   ≥ 50 Mitarbeiter ODER (Umsatz > 10 Mio. € UND Bilanz > 10 Mio. €)
  *
  * Großunternehmen (→ Besonders wichtige Einrichtung bei Anlage 1):
- *   ≥ 250 VZÄ ODER (Umsatz ≥ 50 Mio. € UND Bilanz ≥ 43 Mio. €)
+ *   ≥ 250 Mitarbeiter ODER (Umsatz ≥ 50 Mio. € UND Bilanz ≥ 43 Mio. €)
  *
  * Berechnet auf Basis der Formulardaten:
  * - Größenklassifizierung (Klein/Mittel/Groß)
@@ -30,9 +30,9 @@ export function berechneErgebnis(d) {
   const bi = d.konzern === "ja" && d.konzernBilanz ? +d.konzernBilanz : +d.bilanzsumme || 0;
 
   // Größenklassifizierung nach KMU-Empfehlung 2003/361/EG
-  // Groß: ≥ 250 VZÄ ODER (Umsatz ≥ 50 Mio. UND Bilanz ≥ 43 Mio.)
+  // Groß: ≥ 250 Mitarbeiter ODER (Umsatz ≥ 50 Mio. UND Bilanz ≥ 43 Mio.)
   const gr = ma >= 250 || (um >= 50 && bi >= 43);
-  // Mittel: ≥ 50 VZÄ ODER (Umsatz > 10 Mio. UND Bilanz > 10 Mio.) – NICHT Groß
+  // Mittel: ≥ 50 Mitarbeiter ODER (Umsatz > 10 Mio. UND Bilanz > 10 Mio.) – NICHT Groß
   const mi = !gr && (ma >= 50 || (um > 10 && bi > 10));
   const kl = !gr && !mi;
 
@@ -72,17 +72,41 @@ export function berechneErgebnis(d) {
     p = "GRENZFALL";
   }
 
-  // Schwellen-Info: welche Schwelle wurde überschritten und warum
-  const schwellenInfo = [];
+  // Schwellen-Info: Größenklasse + überschrittene Schwelle + NIS-2-relevante Schwelle
+  const schwellenInfo = {};
+
+  // Größenklasse und erfüllte Kriterien
   if (gr) {
-    if (ma >= 250) schwellenInfo.push(`${Math.round(ma)} VZÄ ≥ 250 (Großunternehmen)`);
-    if (um >= 50 && bi >= 43) schwellenInfo.push(`Umsatz ${um} Mio. € ≥ 50 UND Bilanz ${bi} Mio. € ≥ 43 (Großunternehmen)`);
+    schwellenInfo.klasse = "Großunternehmen";
+    const kriterien = [];
+    if (ma >= 250) kriterien.push(`${Math.round(ma)} Mitarbeiter ≥ 250`);
+    if (um >= 50 && bi >= 43) kriterien.push(`Umsatz ${um} Mio. € ≥ 50 UND Bilanz ${bi} Mio. € ≥ 43`);
+    schwellenInfo.erfuellt = kriterien.join(" · ");
   } else if (mi) {
-    if (ma >= 50) schwellenInfo.push(`${Math.round(ma)} VZÄ ≥ 50 (Mittleres Unternehmen)`);
-    if (um > 10 && bi > 10) schwellenInfo.push(`Umsatz ${um} Mio. € > 10 UND Bilanz ${bi} Mio. € > 10 (Mittleres Unternehmen)`);
-  } else if (kl) {
-    schwellenInfo.push("Unter allen Schwellenwerten (Kleinunternehmen)");
+    schwellenInfo.klasse = "Mittleres Unternehmen";
+    const kriterien = [];
+    if (ma >= 50) kriterien.push(`${Math.round(ma)} Mitarbeiter ≥ 50`);
+    if (um > 10 && bi > 10) kriterien.push(`Umsatz ${um} Mio. € > 10 UND Bilanz ${bi} Mio. € > 10`);
+    schwellenInfo.erfuellt = kriterien.join(" · ");
+  } else {
+    schwellenInfo.klasse = "Kleinunternehmen";
+    schwellenInfo.erfuellt = "Unter allen Schwellenwerten";
   }
+
+  // NIS-2-relevante Schwelle je nach Einrichtungstyp
+  if (k.includes("Wesentliche")) {
+    schwellenInfo.nis2Schwelle = "Besonders wichtige Einrichtung: ≥ 250 Mitarbeiter ODER (Umsatz ≥ 50 Mio. € UND Bilanz ≥ 43 Mio. €)";
+  } else if (k.includes("Wichtige")) {
+    schwellenInfo.nis2Schwelle = "Wichtige Einrichtung: ≥ 50 Mitarbeiter ODER (Umsatz > 10 Mio. € UND Bilanz > 10 Mio. €)";
+  }
+
+  // Kennzahlen-Übersicht (auch wenn 0 / nicht angegeben)
+  schwellenInfo.kennzahlen = {
+    ma: ma > 0 ? `${Math.round(ma)} Mitarbeiter` : "nicht angegeben",
+    um: um > 0 ? `${um} Mio. €` : "nicht angegeben",
+    bi: bi > 0 ? `${bi} Mio. €` : "nicht angegeben",
+    konsolidiert: d.konzern === "ja",
+  };
 
   // Indirekte Betroffenheit über Lieferkette
   const lr =

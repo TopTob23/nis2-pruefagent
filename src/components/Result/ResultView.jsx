@@ -14,6 +14,19 @@ export default function ResultView({ data, result, onEdit }) {
 
   return (
     <div className="max-w-5xl mx-auto">
+      {/* Print-only Header */}
+      <div className="print-header">
+        <img src="/sits logo.png" alt="SITS Group" style={{ height: 36 }} />
+        <div>
+          <div style={{ fontSize: "16pt", fontWeight: 800, color: "#005868", fontFamily: "Manrope, sans-serif" }}>
+            NIS-2 Betroffenheitsprüfung
+          </div>
+          <div style={{ fontSize: "9pt", color: "#70797c" }}>
+            {data.orgName || "Unternehmen"} · Erstellt am {new Date().toLocaleDateString("de-DE")} · SITS Group
+          </div>
+        </div>
+      </div>
+
       {/* Result Header */}
       <section className="mb-16">
         <div className="flex flex-col md:flex-row items-center gap-8 md:gap-16">
@@ -68,13 +81,6 @@ export default function ResultView({ data, result, onEdit }) {
             <div className="divide-y divide-surface-container-high">
               <DetailRow label="Einrichtungstyp" value={r.k} />
               <DetailRow
-                label="Größenklasse"
-                value={
-                  r.gr ? "Großunternehmen" : r.mi ? "Mittleres Unternehmen" : "Klein-/Kleinstunternehmen"
-                }
-                sub={`${r.ma > 0 ? `${Math.round(r.ma)} VZÄ` : "VZÄ: k.A."}${r.um > 0 ? ` · ${r.um} Mio. € Umsatz` : ""}${r.bi > 0 ? ` · ${r.bi} Mio. € Bilanz` : ""}${data.konzern === "ja" ? " (kons.)" : ""}`}
-              />
-              <DetailRow
                 label="Sektorzuordnung"
                 value={
                   <span className="flex flex-wrap gap-2">
@@ -89,23 +95,29 @@ export default function ResultView({ data, result, onEdit }) {
                 label="Sondermerkmale"
                 value={r.hs ? <span className="text-error font-semibold">Ja</span> : "Kein Sondermerkmal"}
               />
-              <DetailRow
-                label="Größenklassifizierung"
-                value={
-                  isJa ? (
-                    <span className="text-error font-bold flex items-center gap-1">
-                      Schwelle überschritten
-                      <span className="material-symbols-outlined text-sm">trending_up</span>
+              {r.schwellenInfo?.nis2Schwelle && (
+                <DetailRow
+                  label="NIS-2-Schwelle"
+                  value={
+                    <span className="flex items-center gap-2">
+                      <span className={`font-bold ${isJa ? "text-error" : isGrenz ? "text-secondary" : "text-primary"}`}>
+                        {isJa ? "Erfüllt" : isGrenz ? "Grenzbereich" : "Nicht erfüllt"}
+                      </span>
+                      {isJa && <span className="material-symbols-outlined text-error text-sm">check_circle</span>}
                     </span>
-                  ) : isGrenz ? (
-                    <span className="text-secondary font-bold">Grenzbereich (&lt;15% über Schwelle)</span>
-                  ) : (
-                    <span className="text-primary">Unter Schwellenwerten</span>
-                  )
-                }
-                sub={r.schwellenInfo && r.schwellenInfo.length > 0
-                  ? r.schwellenInfo.join(" · ")
-                  : undefined
+                  }
+                  sub={r.schwellenInfo.nis2Schwelle}
+                />
+              )}
+              <DetailRow
+                label="Unternehmensdaten"
+                value={
+                  <span className="text-sm">
+                    Mitarbeiter: <strong>{r.schwellenInfo?.kennzahlen?.ma}</strong>
+                    {" · "}Umsatz: <strong>{r.schwellenInfo?.kennzahlen?.um}</strong>
+                    {" · "}Bilanz: <strong>{r.schwellenInfo?.kennzahlen?.bi}</strong>
+                    {r.schwellenInfo?.kennzahlen?.konsolidiert && <span className="text-outline ml-1">(konsolidiert)</span>}
+                  </span>
                 }
               />
               {r.rg && <DetailRow label="Rechtsgrundlage" value={<span className="font-mono text-sm">{r.rg}</span>} />}
