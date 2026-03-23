@@ -9,6 +9,7 @@ export function useAnalysis() {
   const [useWebSearch, setUseWebSearch] = useState(true);
   const [sources, setSources] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
   const [dragOver, setDragOver] = useState(false);
 
   const validUrls = useMemo(() => urls.filter((u) => u.trim().length > 5), [urls]);
@@ -55,6 +56,7 @@ export function useAnalysis() {
 
   const runAnalysis = useCallback(async () => {
     setLoading(true);
+    setError(null);
     setSources([]);
     try {
       const { data, quellen } = await analyzeAndPrefill({
@@ -68,6 +70,7 @@ export function useAnalysis() {
       return data;
     } catch (e) {
       console.error("Analyse-Fehler:", e);
+      setError(e.message);
       return null;
     } finally {
       setLoading(false);
@@ -85,6 +88,7 @@ export function useAnalysis() {
     setUseWebSearch,
     sources,
     loading,
+    error,
     dragOver,
     setDragOver,
     validUrls,

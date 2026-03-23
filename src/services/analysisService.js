@@ -85,17 +85,19 @@ export async function analyzeAndPrefill({ useFiles, useWebsites, useWebSearch, f
   };
   if (tools.length > 0) body.tools = tools;
 
-  const resp = await fetch("https://api.anthropic.com/v1/messages", {
+  const resp = await fetch("/api/anthropic", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(body),
   });
 
+  const responseData = await resp.json();
+
   if (!resp.ok) {
-    throw new Error(`API-Fehler: ${resp.status} ${resp.statusText}`);
+    const errMsg = responseData.error?.message || responseData.error || `${resp.status} ${resp.statusText}`;
+    throw new Error(`API-Fehler: ${errMsg}`);
   }
 
-  const responseData = await resp.json();
   const text = responseData.content?.map((c) => (c.type === "text" ? c.text : "")).join("") || "";
   const clean = text.replace(/```json|```/g, "").trim();
 

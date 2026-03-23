@@ -1,20 +1,26 @@
 import { cn } from "../../utils/cn";
 
-/**
- * @param {Object} props
- * @param {boolean} props.active - Ob der Chip ausgewählt ist
- * @param {function} props.onClick
- * @param {"remove"|"add"} [props.variant] - "remove" = rot, default = grün/petrol
- * @param {React.ReactNode} props.children
- */
 export default function Chip({ active, onClick, variant, children }) {
   return (
-    <div
-      className={cn("ch", active && (variant === "remove" ? "chr" : "cha"))}
+    <button
+      type="button"
+      className={cn(
+        "flex items-center gap-2 px-5 py-3 rounded-full font-medium text-sm transition-all border-2",
+        active && variant !== "remove" && "bg-primary text-white border-primary shadow-md",
+        active && variant === "remove" && "bg-error/10 text-error border-error/30",
+        !active && "bg-surface-container-highest text-on-surface-variant border-transparent hover:border-outline-variant"
+      )}
       onClick={onClick}
     >
-      {active && <span style={{ marginRight: 4 }}>{variant === "remove" ? "☒" : "✓"}</span>}
+      {active && (
+        <span className="material-symbols-outlined text-[18px]" style={{ fontVariationSettings: "'FILL' 1" }}>
+          {variant === "remove" ? "cancel" : "check_circle"}
+        </span>
+      )}
+      {!active && (
+        <span className="material-symbols-outlined text-[18px]">add_circle</span>
+      )}
       {children}
-    </div>
+    </button>
   );
 }

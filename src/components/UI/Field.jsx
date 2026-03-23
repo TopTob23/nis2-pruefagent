@@ -1,24 +1,14 @@
-import { COLORS } from "../../constants/branding";
-
 export default function Field({ label, hint, children }) {
   return (
     <div>
-      <label
-        style={{
-          display: "block",
-          fontSize: 13,
-          fontWeight: 500,
-          color: COLORS.T,
-          marginBottom: 6,
-        }}
-      >
+      <label className="block text-sm font-semibold text-on-surface-variant font-label uppercase tracking-wider mb-2">
         {label}
       </label>
       {children}
       {hint && (
-        <div style={{ fontSize: 12, color: "#7a9ca5", marginTop: 4, lineHeight: 1.4 }}>
+        <p className="text-xs text-on-surface-variant/70 mt-1.5 leading-relaxed italic">
           {hint}
-        </div>
+        </p>
       )}
     </div>
   );
