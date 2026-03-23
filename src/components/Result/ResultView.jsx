@@ -138,51 +138,10 @@ export default function ResultView({ data, result, onEdit }) {
             </div>
           </div>
 
-          {/* Recommendation Cards */}
-          {isJa && (
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div className="bg-primary text-white rounded-xl p-6 shadow-lg">
-                <div className="w-12 h-12 rounded-lg bg-white/10 flex items-center justify-center mb-6">
-                  <span className="material-symbols-outlined text-accent" style={{ fontVariationSettings: "'FILL' 1" }}>assignment</span>
-                </div>
-                <h4 className="text-lg font-bold mb-2 font-headline">Audit vorbereiten</h4>
-                <p className="text-white/70 text-sm leading-relaxed mb-6">
-                  GAP-Analyse gegen § 30 BSIG durchführen. ISMS aufbauen (ISO 27001 / BSI IT-Grundschutz).
-                </p>
-              </div>
-              <div className="bg-surface-container-high rounded-xl p-6">
-                <div className="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center mb-6">
-                  <span className="material-symbols-outlined text-primary">how_to_reg</span>
-                </div>
-                <h4 className="text-lg font-bold text-primary mb-2 font-headline">BSI Registrierung</h4>
-                <p className="text-on-surface-variant text-sm leading-relaxed mb-6">
-                  Registrierung beim BSI bis spätestens 06.03.2026. Incident-Response mit 24/72h-Meldefristen einrichten.
-                </p>
-              </div>
-            </div>
-          )}
-
-          {isGrenz && (
-            <div className="bg-accent/10 border border-accent/30 rounded-xl p-6">
-              <h4 className="text-lg font-bold text-primary mb-2 font-headline">Vertiefte Prüfung empfohlen</h4>
-              <p className="text-on-surface-variant text-sm leading-relaxed">
-                Schwellenwerte nahe der Grenze. Dringend: Rechtsberater einbinden, Kennzahlen exakt ermitteln, im Zweifel vorsorglich registrieren.
-              </p>
-            </div>
-          )}
-
-          {isNein && (
-            <div className="bg-primary/5 border border-primary/10 rounded-xl p-6">
-              <h4 className="text-lg font-bold text-primary mb-2 font-headline">Empfehlung</h4>
-              <p className="text-on-surface-variant text-sm leading-relaxed">
-                Nach aktuellem Stand keine NIS-2-Pflicht. Empfehlung: Jährlich wiederholen, Prüfprozess dokumentieren, freiwillige Maßnahmen prüfen.
-              </p>
-            </div>
-          )}
         </div>
 
-        {/* Side Actions */}
-        <div className="space-y-6">
+        {/* Actions Sidebar */}
+        <div className="space-y-6 no-print">
           <div className="bg-surface-container-lowest border border-surface-container-highest rounded-xl p-6 shadow-sm">
             <h3 className="font-bold text-primary mb-4 font-headline">Aktionen</h3>
             <div className="space-y-3">
@@ -209,18 +168,6 @@ export default function ResultView({ data, result, onEdit }) {
                 <span className="material-symbols-outlined text-sm">refresh</span>
                 Neue Prüfung starten
               </button>
-            </div>
-          </div>
-
-          <div className="bg-gradient-to-br from-primary to-primary-container rounded-xl p-6 text-white shadow-xl relative overflow-hidden">
-            <div className="relative z-10">
-              <h4 className="font-bold mb-2 font-headline">Benötigen Sie Hilfe?</h4>
-              <p className="text-white/80 text-sm mb-6">
-                Unsere Experten unterstützen Sie bei der NIS-2 Umsetzung und Zertifizierung.
-              </p>
-            </div>
-            <div className="absolute -right-4 -bottom-4 opacity-10">
-              <span className="material-symbols-outlined text-[120px]">shield</span>
             </div>
           </div>
         </div>
