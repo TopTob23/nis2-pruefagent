@@ -103,11 +103,10 @@ export default function ResultView({ data, result, onEdit }) {
                     <span className="text-primary">Unter Schwellenwerten</span>
                   )
                 }
-                sub={[
-                  r.ma > 0 ? `${Math.round(r.ma)} VZÄ ${r.gr ? "(≥250)": r.mi ? "(≥50)" : "(<50)"}` : null,
-                  r.um > 0 ? `${r.um} Mio. € Umsatz ${r.um >= 50 ? "(≥50)" : r.um >= 10 ? "(≥10)" : "(<10)"}` : null,
-                  r.bi > 0 ? `${r.bi} Mio. € Bilanz ${r.bi >= 43 ? "(≥43)" : r.bi >= 10 ? "(≥10)" : "(<10)"}` : null,
-                ].filter(Boolean).join(" · ") || undefined}
+                sub={r.schwellenInfo && r.schwellenInfo.length > 0
+                  ? r.schwellenInfo.join(" · ")
+                  : undefined
+                }
               />
               {r.rg && <DetailRow label="Rechtsgrundlage" value={<span className="font-mono text-sm">{r.rg}</span>} />}
               <DetailRow
