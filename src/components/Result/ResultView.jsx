@@ -178,7 +178,7 @@ export default function ResultView({ data, result, onEdit }) {
         <div className="relative z-10">
           <h4 className="text-xl font-bold mb-2 font-headline">Benötigen Sie Hilfe oder haben Fragen zur Planung und Umsetzung von NIS-2?</h4>
           <p className="text-white/80 text-sm mb-6">
-            Unsere Experten unterstützen Sie bei der NIS-2 Umsetzung, dem Aufbau eines ISMS, der GRC-Toolauswahl oder der Einführung eines Business Continuity Managements.
+            Unsere Experten unterstützen Sie bei der NIS-2 Planung und Umsetzung, dem Aufbau eines ISMS, der GRC-Toolauswahl oder der Einführung eines Business Continuity Managements.
           </p>
           <a
             href="https://sits.group"
