@@ -62,6 +62,7 @@
  *   Fix 4: Finanzschwellen UND-verknüpft (Umsatz UND Bilanz, nicht ODER)
  *   Fix 5: Mutation-Bug in Telekom-Logik behoben (kein Seiteneffekt mehr)
  *   Fix 6: Lieferketten-Risiko: alle Anhang-I-Sektoren als kritisch erkannt
+ *   Fix 7: Fehlende Daten nur Grenzfall wenn ergebnisrelevant (nicht pauschal)
  */
 
 
@@ -629,15 +630,44 @@ function pruefeGrenzfall(einrichtungsErgebnis, groesseErgebnis, sektorErgebnis) 
     );
   }
 
-  // Grund 3: Fehlende Daten
-  if (groesseErgebnis.fehlendeDaten.length > 0) {
+  // Grund 3: Fehlende Daten – aber NUR wenn sie das Ergebnis ändern könnten.
+  //
+  // REGEL: Fehlende Daten sind NUR dann ein Grenzfall-Grund, wenn die
+  //         Größenklasse "klein" ist UND ein Sektor erkannt wurde.
+  //
+  //   Warum?
+  //   - Bei klasse="klein" + Sektor: pflicht=NEIN, aber fehlende Daten
+  //     könnten die Schwelle doch überschreiten → GRENZFALL (statt NEIN)
+  //   - Bei klasse="mittel" oder "gross": Die Größe ist bereits durch
+  //     vorhandene Daten belegt (z.B. MA=400 reicht allein für "gross").
+  //     Fehlende Finanzdaten können das nicht rückgängig machen → KEIN Grenzfall.
+  //
+  //   Beispiel: 400 MA, Umsatz unbekannt, Bilanz unbekannt
+  //   → klasse="gross" (weil 400 ≥ 250), pflicht=JA → KEIN Grenzfall.
+  //
+  //   Beispiel: 40 MA, Umsatz unbekannt, Bilanz unbekannt
+  //   → klasse="klein", aber Umsatz+Bilanz könnten > 10 sein → GRENZFALL.
+  //
+  var fehlendeDatenRelevant = (
+    groesseErgebnis.fehlendeDaten.length > 0 &&
+    groesseErgebnis.klasse === "klein" &&
+    sektorErgebnis.anhang !== null
+  );
+  if (fehlendeDatenRelevant) {
     gruende.push(
-      "Fehlende Angaben: " + groesseErgebnis.fehlendeDaten.join(", ") + "."
+      "Fehlende Angaben: " + groesseErgebnis.fehlendeDaten.join(", ") +
+      ". Bei Vorliegen dieser Daten könnte die Schwelle überschritten werden."
     );
   }
 
-  // Wenn pflicht=JA UND Grenzfallgründe existieren → GRENZFALL
+  // Wenn pflicht=JA UND Grenzfallgründe → GRENZFALL (statt JA)
   if (einrichtungsErgebnis.pflicht === "JA" && gruende.length > 0) {
+    einrichtungsErgebnis.pflicht = "GRENZFALL";
+    einrichtungsErgebnis.begruendung += " GRENZFALL: " + gruende.join(" ");
+  }
+
+  // Wenn pflicht=NEIN UND fehlende Daten relevant → GRENZFALL (statt NEIN)
+  if (einrichtungsErgebnis.pflicht === "NEIN" && fehlendeDatenRelevant) {
     einrichtungsErgebnis.pflicht = "GRENZFALL";
     einrichtungsErgebnis.begruendung += " GRENZFALL: " + gruende.join(" ");
   }

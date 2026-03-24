@@ -393,23 +393,41 @@ export function bestimmeEinrichtungsklasse(sondermerkmalErgebnis, sektorErgebnis
 function pruefeGrenzfall(einrichtungsErgebnis, groesseErgebnis, sektorErgebnis) {
   const gruende = [];
 
+  // Grund 1: Schwellenwert-Nähe (< 15%)
   for (let i = 0; i < groesseErgebnis.grenzfaelle.length; i++) {
     gruende.push(groesseErgebnis.grenzfaelle[i]);
   }
 
+  // Grund 2: Mischsektor
   if (sektorErgebnis.mischsektor) {
     gruende.push(
       "Mischsektor: Tätigkeiten fallen sowohl unter Anhang I als auch Anhang II."
     );
   }
 
-  if (groesseErgebnis.fehlendeDaten.length > 0) {
+  // Grund 3: Fehlende Daten – aber NUR wenn sie das Ergebnis ändern könnten.
+  // Bei klasse="klein" + Sektor: fehlende Daten könnten Schwelle überschreiten → GRENZFALL
+  // Bei klasse="mittel"/"gross": Größe bereits durch vorhandene Daten belegt → KEIN Grenzfall
+  const fehlendeDatenRelevant = (
+    groesseErgebnis.fehlendeDaten.length > 0 &&
+    groesseErgebnis.klasse === "klein" &&
+    sektorErgebnis.anhang !== null
+  );
+  if (fehlendeDatenRelevant) {
     gruende.push(
-      "Fehlende Angaben: " + groesseErgebnis.fehlendeDaten.join(", ") + "."
+      "Fehlende Angaben: " + groesseErgebnis.fehlendeDaten.join(", ") +
+      ". Bei Vorliegen dieser Daten könnte die Schwelle überschritten werden."
     );
   }
 
+  // Wenn pflicht=JA UND Grenzfallgründe → GRENZFALL (statt JA)
   if (einrichtungsErgebnis.pflicht === "JA" && gruende.length > 0) {
+    einrichtungsErgebnis.pflicht = "GRENZFALL";
+    einrichtungsErgebnis.begruendung += " GRENZFALL: " + gruende.join(" ");
+  }
+
+  // Wenn pflicht=NEIN UND fehlende Daten relevant → GRENZFALL (statt NEIN)
+  if (einrichtungsErgebnis.pflicht === "NEIN" && fehlendeDatenRelevant) {
     einrichtungsErgebnis.pflicht = "GRENZFALL";
     einrichtungsErgebnis.begruendung += " GRENZFALL: " + gruende.join(" ");
   }

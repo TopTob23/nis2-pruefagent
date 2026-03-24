@@ -1,10 +1,14 @@
 /**
- * Automatisierte Tests fuer prueflogik.js
- * VERSION: 2.2
+ * ═══════════════════════════════════════════════════════════════════════
+ * DATEI:    prueflogik.test.js
+ * ZWECK:    Automatisierte Tests für prueflogik.js
+ * VERSION:  2.2
+ * ═══════════════════════════════════════════════════════════════════════
  *
- * AUSFUEHREN: node test/prueflogik.test.js
+ * AUSFÜHREN:  node prueflogik.test.js
  *
- * ALLE 35 TESTS MUESSEN BESTEHEN.
+ * ALLE 35 TESTS MÜSSEN BESTEHEN.
+ * Wenn ein Test fehlschlägt, gibt das Skript Exit-Code 1 zurück.
  */
 
 var logik = require("./prueflogik.cjs");
@@ -25,6 +29,10 @@ function test(name, tatsaechlich, erwartet) {
   }
 }
 
+
+// ═══════════════════════════════════════════════════════════════════════
+// GRUPPE 1: TESTSZENARIEN AUS AGENT-KONFIGURATION v2
+// ═══════════════════════════════════════════════════════════════════════
 
 console.log("\n═══ Szenario 1: IT-MSP, 120 VZÄ, NIS-2-Kunden ═══");
 console.log("Erwartet: JA | wE + Lieferkette HOCH\n");
@@ -129,6 +137,10 @@ console.log("Erwartet: JA | wE, kein Abschnitt 4a\n");
 })();
 
 
+// ═══════════════════════════════════════════════════════════════════════
+// GRUPPE 2: FIX 1 – SONDERMERKMALE DIFFERENZIERT
+// ═══════════════════════════════════════════════════════════════════════
+
 console.log("\n═══ Fix 1a: KRITIS → KRITIS/bwE (ohne Größe) ═══\n");
 (function() {
   var r = logik.nis2Pruefung({
@@ -175,6 +187,10 @@ console.log("\n═══ Fix 1c: Qual. VDA → bwE (ohne Größe) ═══\n");
 })();
 
 
+// ═══════════════════════════════════════════════════════════════════════
+// GRUPPE 3: FIX 2 – FINANZSCHWELLEN > (STRIKT) NICHT ≥
+// ═══════════════════════════════════════════════════════════════════════
+
 console.log("\n═══ Fix 2a: Umsatz exakt 10 + Bilanz 15 → NICHT mittel ═══\n");
 (function() {
   var r = logik.pruefeGroesse({
@@ -208,6 +224,10 @@ console.log("\n═══ Fix 2c: Mitarbeiter exakt 50 → mittel (≥ bei MA!) �
   test("Klasse = mittel (50 ≥ 50)", r.klasse, "mittel");
 })();
 
+
+// ═══════════════════════════════════════════════════════════════════════
+// GRUPPE 4: FIX 3 – TELEKOMMUNIKATIONSANBIETER
+// ═══════════════════════════════════════════════════════════════════════
 
 console.log("\n═══ Fix 3a: Telekom + groß → bwE ═══\n");
 (function() {
@@ -254,6 +274,10 @@ console.log("\n═══ Fix 3c: Telekom + mittel → bwE ═══\n");
 })();
 
 
+// ═══════════════════════════════════════════════════════════════════════
+// GRUPPE 5: FIX 4 – FINANZSCHWELLEN UND-VERKNÜPFUNG
+// ═══════════════════════════════════════════════════════════════════════
+
 console.log("\n═══ Fix 4a: Nur Umsatz > 10, Bilanz ≤ 10 → NICHT mittel ═══\n");
 (function() {
   var r = logik.pruefeGroesse({
@@ -299,6 +323,10 @@ console.log("\n═══ Fix 4d: Umsatz > 50 aber Bilanz ≤ 43 → NICHT gross 
 })();
 
 
+// ═══════════════════════════════════════════════════════════════════════
+// GRUPPE 6: FIX 5 – KEINE MUTATION DES EINGABE-OBJEKTS
+// ═══════════════════════════════════════════════════════════════════════
+
 console.log("\n═══ Fix 5: Telekom + klein mutiert NICHT das Eingabe-Objekt ═══\n");
 (function() {
   var sondermerkmale = { hatSondermerkmal: true, brauchtGroesse: true,
@@ -312,6 +340,10 @@ console.log("\n═══ Fix 5: Telekom + klein mutiert NICHT das Eingabe-Objekt
   test("hatSondermerkmal ist IMMER NOCH true", sondermerkmale.hatSondermerkmal, true);
 })();
 
+
+// ═══════════════════════════════════════════════════════════════════════
+// GRUPPE 7: KONZERNKONSOLIDIERUNG
+// ═══════════════════════════════════════════════════════════════════════
 
 console.log("\n═══ Konzern: Einzelwerte klein, Konzernwerte groß ═══\n");
 (function() {
@@ -333,6 +365,10 @@ console.log("\n═══ Konzern: Einzelwerte klein, Konzernwerte groß ══�
 })();
 
 
+// ═══════════════════════════════════════════════════════════════════════
+// GRUPPE 8: INTEGRATION (konvertiereApiAntwort)
+// ═══════════════════════════════════════════════════════════════════════
+
 console.log("\n═══ Integration: konvertiereApiAntwort mit null-Werten ═══\n");
 (function() {
   var konvertiert = integration.konvertiereApiAntwort({
@@ -343,7 +379,7 @@ console.log("\n═══ Integration: konvertiereApiAntwort mit null-Werten ═�
     spiA1_ids: null,
     spiA2_ids: ["post"],
     sondermerkmale: null,
-    konzern: "JA",
+    konzern: "JA",       // Groß geschrieben!
     lieferkette: null,
   });
   test("mitarbeiter = leerer String", konvertiert.mitarbeiter, "");
@@ -362,6 +398,10 @@ console.log("\n═══ Integration: konvertiereApiAntwort mit null-Input ═�
 })();
 
 
+// ═══════════════════════════════════════════════════════════════════════
+// GRUPPE 9: HILFSFUNKTIONEN
+// ═══════════════════════════════════════════════════════════════════════
+
 console.log("\n═══ parseZahl: verschiedene Eingabeformate ═══\n");
 (function() {
   test('parseZahl("120") = 120', logik.parseZahl("120"), 120);
@@ -372,6 +412,74 @@ console.log("\n═══ parseZahl: verschiedene Eingabeformate ═══\n");
   test('parseZahl(undefined) = null', logik.parseZahl(undefined), null);
 })();
 
+
+// ═══════════════════════════════════════════════════════════════════════
+// GRUPPE 10: FIX 7 – FEHLENDE DATEN NUR GRENZFALL WENN RELEVANT
+// ═══════════════════════════════════════════════════════════════════════
+
+console.log("\n═══ Fix 7a: 400 MA, kein Umsatz/Bilanz → JA (NICHT Grenzfall!) ═══\n");
+(function() {
+  var r = logik.nis2Pruefung({
+    sondermerkmale: [],
+    spiA1_ids: ["iktb2b"],
+    spiA2_ids: [],
+    mitarbeiter: "400",
+    umsatz: "",
+    bilanzsumme: "",
+    konzern: "nein",
+  });
+  test("Pflicht = JA (nicht GRENZFALL!)", r.ergebnis.pflicht, "JA");
+  test("Klasse = bwE (Groß + Anhang I)", r.ergebnis.klasse, "bwE");
+})();
+
+console.log("\n═══ Fix 7b: 120 MA, kein Umsatz/Bilanz → JA (NICHT Grenzfall!) ═══\n");
+(function() {
+  var r = logik.nis2Pruefung({
+    sondermerkmale: [],
+    spiA1_ids: ["iktb2b"],
+    spiA2_ids: [],
+    mitarbeiter: "120",
+    umsatz: "",
+    bilanzsumme: "",
+    konzern: "nein",
+  });
+  test("Pflicht = JA (MA 120 reicht allein)", r.ergebnis.pflicht, "JA");
+  test("Klasse = wE", r.ergebnis.klasse, "wE");
+})();
+
+console.log("\n═══ Fix 7c: 40 MA, kein Umsatz/Bilanz, Sektor → GRENZFALL ═══\n");
+(function() {
+  var r = logik.nis2Pruefung({
+    sondermerkmale: [],
+    spiA1_ids: ["iktb2b"],
+    spiA2_ids: [],
+    mitarbeiter: "40",
+    umsatz: "",
+    bilanzsumme: "",
+    konzern: "nein",
+  });
+  test("Pflicht = GRENZFALL (fehlende Finanzdaten könnten Schwelle überschreiten)",
+       r.ergebnis.pflicht, "GRENZFALL");
+})();
+
+console.log("\n═══ Fix 7d: 40 MA, kein Umsatz/Bilanz, KEIN Sektor → NEIN ═══\n");
+(function() {
+  var r = logik.nis2Pruefung({
+    sondermerkmale: [],
+    spiA1_ids: [],
+    spiA2_ids: [],
+    mitarbeiter: "40",
+    umsatz: "",
+    bilanzsumme: "",
+    konzern: "nein",
+  });
+  test("Pflicht = NEIN (kein Sektor = kein Grenzfall)", r.ergebnis.pflicht, "NEIN");
+})();
+
+
+// ═══════════════════════════════════════════════════════════════════════
+// ERGEBNIS
+// ═══════════════════════════════════════════════════════════════════════
 
 console.log("\n═══════════════════════════════════════════════════════════");
 console.log("   ERGEBNIS: " + bestanden + " bestanden, " + fehlgeschlagen + " fehlgeschlagen");
