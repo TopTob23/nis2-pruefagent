@@ -24,12 +24,14 @@ export const ANLAGE2 = [
   { id: "forschung", l: "Forschung" },
 ];
 
-// Größenunabhängige Sondermerkmale
+// Größenunabhängige Sondermerkmale – all 8 matching prueflogik.js SONDERMERKMALE keys
 export const SONDERMERKMALE = [
   { id: "kritis", l: "Betreiber einer kritischen Anlage (KRITIS gem. BSI-KritisV)" },
-  { id: "vertrauen", l: "Qualifizierter Vertrauensdiensteanbieter (eIDAS-VO)" },
+  { id: "telekom", l: "Anbieter öffentlicher Telekommunikationsdienste/-netze" },
+  { id: "qualVDA", l: "Qualifizierter Vertrauensdiensteanbieter (eIDAS-VO)" },
   { id: "tld", l: "TLD-Name-Registry" },
   { id: "dns", l: "DNS-Diensteanbieter" },
+  { id: "nichtQualVDA", l: "Nicht-qualifizierter Vertrauensdiensteanbieter" },
   { id: "ixp", l: "Internet Exchange Point (IXP) Betreiber" },
-  { id: "bund", l: "Bundesbehörde / öffentl. Verwaltung Bundesebene" },
+  { id: "bundesbehoerde", l: "Bundesbehörde / öffentl. Verwaltung Bundesebene" },
 ];

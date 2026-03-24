@@ -46,8 +46,8 @@ export default function StepTaetigkeit({ data, setField, toggleArrayItem }) {
               {ANLAGE1.map((x) => (
                 <Chip
                   key={x.id}
-                  active={data.spiA1.includes(x.id)}
-                  onClick={() => toggleArrayItem("spiA1", x.id)}
+                  active={data.spiA1_ids.includes(x.id)}
+                  onClick={() => toggleArrayItem("spiA1_ids", x.id)}
                 >
                   {x.l}
                 </Chip>
@@ -63,8 +63,8 @@ export default function StepTaetigkeit({ data, setField, toggleArrayItem }) {
               {ANLAGE2.map((x) => (
                 <Chip
                   key={x.id}
-                  active={data.spiA2.includes(x.id)}
-                  onClick={() => toggleArrayItem("spiA2", x.id)}
+                  active={data.spiA2_ids.includes(x.id)}
+                  onClick={() => toggleArrayItem("spiA2_ids", x.id)}
                 >
                   {x.l}
                 </Chip>
@@ -72,7 +72,7 @@ export default function StepTaetigkeit({ data, setField, toggleArrayItem }) {
             </div>
           </div>
 
-          {(data.spiA1.length > 0 || data.spiA2.length > 0) && (
+          {(data.spiA1_ids.length > 0 || data.spiA2_ids.length > 0) && (
             <div className="bg-surface-container-low rounded-lg p-6 flex gap-4 items-start">
               <span className="material-symbols-outlined text-primary">info</span>
               <p className="text-sm text-on-surface-variant leading-relaxed">

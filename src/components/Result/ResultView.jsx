@@ -1,16 +1,43 @@
 import { getSektorNamen } from "../../logic/prueflogik";
 
 export default function ResultView({ data, result, onEdit }) {
-  const r = result;
-  const sektorNamen = getSektorNamen(data.spiA1, data.spiA2);
+  const e = result.ergebnis;
+  const schritte = result.schritte;
+  const sektorNamen = getSektorNamen(data.spiA1_ids, data.spiA2_ids);
 
-  const isJa = r.p === "JA";
-  const isNein = r.p === "NEIN";
-  const isGrenz = r.p === "GRENZFALL";
+  const isJa = e.pflicht === "JA";
+  const isNein = e.pflicht === "NEIN";
+  const isGrenz = e.pflicht === "GRENZFALL";
 
   const statusIcon = isJa ? "gpp_bad" : isNein ? "verified_user" : "gpp_maybe";
   const statusLabel = isJa ? "BETROFFEN" : isNein ? "NICHT BETROFFEN" : "GRENZFALL";
   const statusColor = isJa ? "text-error" : isNein ? "text-primary" : "text-secondary";
+
+  // Sector assignment info
+  const hatA1 = (data.spiA1_ids || []).length > 0;
+  const hatA2 = (data.spiA2_ids || []).length > 0;
+  const hatSonder = (data.sondermerkmale || []).length > 0;
+
+  // Groesse info from schritte
+  const groesse = schritte?.groesse;
+  const kennzahlen = groesse ? {
+    ma: groesse.ma !== null ? `${Math.round(groesse.ma)} Mitarbeiter` : "nicht angegeben",
+    um: groesse.umsatz !== null ? `${groesse.umsatz} Mio. €` : "nicht angegeben",
+    bi: groesse.bilanz !== null ? `${groesse.bilanz} Mio. €` : "nicht angegeben",
+    konsolidiert: groesse.basis === "konsolidiert (Konzern)",
+  } : null;
+
+  // NIS-2 threshold info
+  let nis2Schwelle = null;
+  if (e.klasseLabel?.includes("Besonders wichtige") || e.klasse === "bwE" || e.klasse === "KRITIS/bwE") {
+    nis2Schwelle = "Besonders wichtige Einrichtung: ≥ 250 Mitarbeiter ODER (Umsatz > 50 Mio. € UND Bilanz > 43 Mio. €)";
+  } else if (e.klasseLabel?.includes("Wichtige") || e.klasse === "wE") {
+    nis2Schwelle = "Wichtige Einrichtung: ≥ 50 Mitarbeiter ODER (Umsatz > 10 Mio. € UND Bilanz > 10 Mio. €)";
+  }
+
+  // Indirekte Betroffenheit
+  const lk = schritte?.lieferkette;
+  const lkBeziehung = data.lieferkette?.hatBeziehung;
 
   return (
     <div className="max-w-5xl mx-auto">
@@ -57,7 +84,7 @@ export default function ResultView({ data, result, onEdit }) {
               </span>
             </div>
             <h1 className="text-4xl md:text-5xl font-extrabold text-primary mb-4 tracking-tight leading-tight font-headline">
-              {isNein ? "Nicht erfasst" : r.k}
+              {isNein ? "Nicht erfasst" : e.klasseLabel}
             </h1>
             <p className="text-on-surface-variant text-lg max-w-2xl leading-relaxed">
               {isJa && "Basierend auf Ihren Angaben erfüllt Ihr Unternehmen die Kriterien gemäß BSIG in Verbindung mit der NIS-2-Richtlinie. Eine Registrierung beim BSI ist zwingend erforderlich."}
@@ -79,23 +106,23 @@ export default function ResultView({ data, result, onEdit }) {
               Analyse-Details
             </h3>
             <div className="divide-y divide-surface-container-high">
-              <DetailRow label="Einrichtungstyp" value={r.k} />
+              <DetailRow label="Einrichtungstyp" value={e.klasseLabel || "Nicht erfasst"} />
               <DetailRow
                 label="Sektorzuordnung"
                 value={
                   <span className="flex flex-wrap gap-2">
-                    {r.h1 && <span className="bg-error/10 text-error px-2 py-0.5 rounded text-xs font-medium">Anlage 1</span>}
-                    {r.h2 && <span className="bg-accent/20 text-secondary px-2 py-0.5 rounded text-xs font-medium">Anlage 2</span>}
-                    {!r.h1 && !r.h2 && <span className="text-outline">Kein NIS-2-Sektor</span>}
+                    {hatA1 && <span className="bg-error/10 text-error px-2 py-0.5 rounded text-xs font-medium">Anlage 1</span>}
+                    {hatA2 && <span className="bg-accent/20 text-secondary px-2 py-0.5 rounded text-xs font-medium">Anlage 2</span>}
+                    {!hatA1 && !hatA2 && <span className="text-outline">Kein NIS-2-Sektor</span>}
                   </span>
                 }
-                sub={(r.h1 || r.h2) ? sektorNamen.join(", ") : undefined}
+                sub={(hatA1 || hatA2) ? sektorNamen.join(", ") : undefined}
               />
               <DetailRow
                 label="Sondermerkmale"
-                value={r.hs ? <span className="text-error font-semibold">Ja</span> : "Kein Sondermerkmal"}
+                value={hatSonder ? <span className="text-error font-semibold">Ja</span> : "Kein Sondermerkmal"}
               />
-              {r.schwellenInfo?.nis2Schwelle && (
+              {nis2Schwelle && (
                 <DetailRow
                   label="NIS-2-Schwelle"
                   value={
@@ -106,29 +133,31 @@ export default function ResultView({ data, result, onEdit }) {
                       {isJa && <span className="material-symbols-outlined text-error text-sm">check_circle</span>}
                     </span>
                   }
-                  sub={r.schwellenInfo.nis2Schwelle}
+                  sub={nis2Schwelle}
                 />
               )}
-              <DetailRow
-                label="Unternehmensdaten"
-                value={
-                  <span className="text-sm">
-                    Mitarbeiter: <strong>{r.schwellenInfo?.kennzahlen?.ma}</strong>
-                    {" · "}Umsatz: <strong>{r.schwellenInfo?.kennzahlen?.um}</strong>
-                    {" · "}Bilanz: <strong>{r.schwellenInfo?.kennzahlen?.bi}</strong>
-                    {r.schwellenInfo?.kennzahlen?.konsolidiert && <span className="text-outline ml-1">(konsolidiert)</span>}
-                  </span>
-                }
-              />
-              {r.rg && <DetailRow label="Rechtsgrundlage" value={<span className="font-mono text-sm">{r.rg}</span>} />}
+              {kennzahlen && (
+                <DetailRow
+                  label="Unternehmensdaten"
+                  value={
+                    <span className="text-sm">
+                      Mitarbeiter: <strong>{kennzahlen.ma}</strong>
+                      {" · "}Umsatz: <strong>{kennzahlen.um}</strong>
+                      {" · "}Bilanz: <strong>{kennzahlen.bi}</strong>
+                      {kennzahlen.konsolidiert && <span className="text-outline ml-1">(konsolidiert)</span>}
+                    </span>
+                  }
+                />
+              )}
+              {e.rechtsgrundlage && <DetailRow label="Rechtsgrundlage" value={<span className="font-mono text-sm">{e.rechtsgrundlage}</span>} />}
               <DetailRow
                 label="Indirekte Betroffenheit"
                 value={
-                  data.lieferbeziehung === "ja" ? (
-                    <span className={r.lr === "HOCH" ? "text-error font-bold" : "text-secondary font-bold"}>
-                      Risiko: {r.lr}
+                  lkBeziehung === "ja" && lk ? (
+                    <span className={e.indirekteBetroffenheit === "HOCH" ? "text-error font-bold" : "text-secondary font-bold"}>
+                      Risiko: {e.indirekteBetroffenheit}
                     </span>
-                  ) : data.lieferbeziehung === "unbekannt" ? (
+                  ) : lkBeziehung === "unbekannt" ? (
                     <span className="text-outline">Nicht bewertet</span>
                   ) : (
                     "Keine relevanten Lieferbeziehungen"
@@ -200,7 +229,7 @@ export default function ResultView({ data, result, onEdit }) {
         <p>
           Automatisiert erstellt durch den NIS-2 Prüfagenten der SITS GmbH. Keine Rechtsberatung. Rechtlich nicht bindend.
         </p>
-        <p className="mt-2 text-outline">Status: Vorläufig · v2.0 · NIS-2 Prüfagent | SITS GmbH</p>
+        <p className="mt-2 text-outline">Status: Vorläufig · v2.2 · NIS-2 Prüfagent | SITS GmbH</p>
       </footer>
     </div>
   );

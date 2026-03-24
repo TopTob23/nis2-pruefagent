@@ -3,6 +3,12 @@ import Input from "../UI/Input";
 import RadioGroup from "../UI/RadioGroup";
 
 export default function StepLieferkette({ data, setField }) {
+  const lk = data.lieferkette || {};
+
+  const setLkField = (key, value) => {
+    setField("lieferkette", { ...lk, [key]: value });
+  };
+
   return (
     <div className="w-full max-w-3xl mx-auto">
       <div className="mb-10 text-center md:text-left">
@@ -10,7 +16,7 @@ export default function StepLieferkette({ data, setField }) {
           Risikomanagement
         </span>
         <h2 className="font-headline text-4xl md:text-5xl font-extrabold text-primary tracking-tight">
-          Schritt 8: Lieferkette
+          Schritt 7: Lieferkette
         </h2>
         <p className="mt-4 text-on-surface-variant max-w-xl text-lg leading-relaxed">
           Bewertung der Abhängigkeiten und Sicherheitsanforderungen Ihrer externen Dienstleister (§ 30 Abs. 2 Nr. 4 BSIG).
@@ -26,33 +32,26 @@ export default function StepLieferkette({ data, setField }) {
                 ["nein", "Nein, aktuell nicht"],
                 ["unbekannt", "Nicht sicher / In Prüfung"],
               ]}
-              value={data.lieferbeziehung}
-              onChange={(v) => setField("lieferbeziehung", v)}
+              value={lk.hatBeziehung || "unbekannt"}
+              onChange={(v) => setLkField("hatBeziehung", v)}
             />
           </Field>
 
-          {data.lieferbeziehung === "ja" && (
+          {lk.hatBeziehung === "ja" && (
             <>
               <div className="h-px bg-surface-container-high w-full" />
 
-              <Field label="NIS-2-pflichtige Kunden">
-                <Input
-                  value={data.lieferKunden}
-                  onChange={(v) => setField("lieferKunden", v)}
-                  placeholder="z.B. Energieversorger, Krankenhaus"
-                />
-              </Field>
               <Field label="Sektoren der Kunden">
                 <Input
-                  value={data.lieferSektoren}
-                  onChange={(v) => setField("lieferSektoren", v)}
+                  value={(lk.kundenSektoren || []).join(", ")}
+                  onChange={(v) => setLkField("kundenSektoren", v.split(",").map(s => s.trim()).filter(Boolean))}
                   placeholder="z.B. Energie, Gesundheit"
                 />
               </Field>
               <Field label="Welche Leistung erbringen Sie?">
                 <Input
-                  value={data.lieferLeistung}
-                  onChange={(v) => setField("lieferLeistung", v)}
+                  value={lk.artLeistung || ""}
+                  onChange={(v) => setLkField("artLeistung", v)}
                   placeholder="z.B. IT-Betrieb, Software, Managed Services"
                 />
               </Field>
@@ -62,18 +61,15 @@ export default function StepLieferkette({ data, setField }) {
                     ["ja", "Ja"],
                     ["nein", "Nein"],
                   ]}
-                  value={data.lieferZugriff}
-                  onChange={(v) => setField("lieferZugriff", v)}
+                  value={lk.itZugriff || "nein"}
+                  onChange={(v) => setLkField("itZugriff", v)}
                 />
               </Field>
               <Field label="Vertragliche IT-Sicherheitsanforderungen?">
-                <RadioGroup
-                  options={[
-                    ["ja", "Ja"],
-                    ["nein", "Nein"],
-                  ]}
-                  value={data.lieferAnforderungen}
-                  onChange={(v) => setField("lieferAnforderungen", v)}
+                <Input
+                  value={lk.vertraglicheAnforderungen || ""}
+                  onChange={(v) => setLkField("vertraglicheAnforderungen", v)}
+                  placeholder="z.B. ISO 27001 gefordert"
                 />
               </Field>
             </>

@@ -1,16 +1,11 @@
 /**
  * KI-gestützte Analyse und Vorbefüllung via Anthropic API
+ * Uses the new SYSTEM_PROMPT from prompts.js, erstelleUserPrompt for building the prompt,
+ * parseJSONRobust for parsing, and konvertiereApiAntwort for cleaning the response.
  */
 
-const SYSTEM_PROMPT = `Du bist ein Analyst für NIS-2-Betroffenheitsprüfungen. Analysiere die bereitgestellten Informationen über ein Unternehmen und extrahiere alle relevanten Daten.
-
-Antworte NUR mit einem JSON-Objekt (kein Markdown, keine Erklärung) mit folgenden Feldern:
-{"orgName":"","rechtsform":"","bundesland":"","ansprechpartner":"","taetigkeit":"","naceCode":"","mitarbeiter":"","umsatz":"","bilanzsumme":"","oeffentlich":"ja/nein/teilweise","oeffentlichEbene":"","konzern":"ja/nein","konzernName":"","konzernMA":"","konzernUmsatz":"","konzernBilanz":"","zertifizierungen":"","spiA1_ids":[],"spiA2_ids":[],"quellen":[{"url":"...","titel":"...","info":"Was wurde daraus entnommen"}]}
-
-Für spiA1_ids verwende nur diese IDs: energie,transport,bankwesen,finanzmarkt,gesundheit,trinkwasser,abwasser,digitalinfra,iktb2b,verwaltung,weltraum
-Für spiA2_ids verwende nur diese IDs: post,abfall,chemie,lebensmittel,verarbeitend,digitaledienste,forschung
-Lasse Felder leer (""), wenn keine Information verfügbar ist. Bei Zahlen nur die Zahl als String.
-Im Feld "quellen" liste ALLE verwendeten Quellen mit präziser Angabe, welche Information daraus stammt.`;
+import { SYSTEM_PROMPT, erstelleUserPrompt, parseJSONRobust } from "./prompts";
+import { konvertiereApiAntwort } from "./integration";
 
 function fileToBase64(file) {
   return new Promise((resolve, reject) => {
@@ -24,17 +19,15 @@ function fileToBase64(file) {
 /**
  * Analysiert Dateien/URLs/Webrecherche und gibt strukturierte Formulardaten zurück.
  *
- * @param {Object} options
- * @param {boolean} options.useFiles
- * @param {boolean} options.useWebsites
- * @param {boolean} options.useWebSearch
- * @param {File[]} options.files
- * @param {string[]} options.validUrls
- * @returns {Promise<{ data: Object|null, quellen: Array }>}
+ * New flow:
+ * 1. Build prompt using erstelleUserPrompt()
+ * 2. Fetch /api/anthropic with SYSTEM_PROMPT
+ * 3. Parse response using parseJSONRobust
+ * 4. Clean with konvertiereApiAntwort()
+ * 5. Return cleaned data mapped to form fields
  */
 export async function analyzeAndPrefill({ useFiles, useWebsites, useWebSearch, files, validUrls }) {
   const msgs = [{ role: "user", content: [] }];
-  const srcInstructions = [];
 
   // Datei-Uploads als Base64
   if (useFiles && files.length > 0) {
@@ -53,33 +46,22 @@ export async function analyzeAndPrefill({ useFiles, useWebsites, useWebSearch, f
         });
       }
     }
-    srcInstructions.push(
-      `${files.length} hochgeladene Datei(en) wurden bereitgestellt. Analysiere deren Inhalt.`
-    );
   }
 
-  // Webseiten-URLs
-  if (useWebsites && validUrls.length > 0) {
-    srcInstructions.push(
-      `Folgende Webseiten des Unternehmens sind angegeben:\n${validUrls.map((u, i) => `${i + 1}. ${u}`).join("\n")}\nRufe diese Seiten ab und extrahiere alle relevanten Unternehmensinformationen.`
-    );
-  }
+  // Build the user prompt using erstelleUserPrompt
+  const userPrompt = erstelleUserPrompt({
+    websiteUrls: (useWebsites && validUrls.length > 0) ? validUrls : [],
+    hatDateien: useFiles && files.length > 0,
+    anzahlDateien: (useFiles && files.length > 0) ? files.length : 0,
+  });
 
-  // Webrecherche
-  if (useWebSearch) {
-    srcInstructions.push(
-      "Führe zusätzlich eine Webrecherche durch, um öffentlich verfügbare Informationen über das Unternehmen zu finden (z.B. Handelsregister, Unternehmenswebseite, Branchenverzeichnisse). Dokumentiere jede gefundene Quelle präzise im Feld 'quellen'."
-    );
-  }
-
-  srcInstructions.push("Extrahiere alle NIS-2-relevanten Informationen und antworte nur mit dem JSON-Objekt.");
-  msgs[0].content.push({ type: "text", text: srcInstructions.join("\n\n") });
+  msgs[0].content.push({ type: "text", text: userPrompt });
 
   const needsWebTool = (useWebsites && validUrls.length > 0) || useWebSearch;
   const tools = needsWebTool ? [{ type: "web_search_20250305", name: "web_search" }] : [];
   const body = {
     model: "claude-sonnet-4-20250514",
-    max_tokens: 2000,
+    max_tokens: 4000,
     system: SYSTEM_PROMPT,
     messages: msgs,
   };
@@ -98,21 +80,35 @@ export async function analyzeAndPrefill({ useFiles, useWebsites, useWebSearch, f
     throw new Error(`API-Fehler: ${errMsg}`);
   }
 
-  const text = responseData.content?.map((c) => (c.type === "text" ? c.text : "")).join("") || "";
-  const clean = text.replace(/```json|```/g, "").trim();
+  // Extract all text blocks from the response
+  const text = responseData.content?.map((c) => (c.type === "text" ? c.text : "")).join("\n") || "";
 
-  const parsed = JSON.parse(clean);
-  const quellen = parsed.quellen && Array.isArray(parsed.quellen) ? parsed.quellen : [];
+  // Parse using robust JSON parser (handles markdown blocks, preamble, etc.)
+  const parsed = parseJSONRobust(text);
+  if (!parsed) {
+    throw new Error("KI-Antwort enthält kein gültiges JSON.");
+  }
 
-  // Mapped result to form fields
+  // Clean with konvertiereApiAntwort (normalizes null/undefined, validates arrays, etc.)
+  const cleaned = konvertiereApiAntwort(parsed);
+
+  // Extract quellen before mapping to form fields
+  const quellen = cleaned.quellen && Array.isArray(cleaned.quellen) ? cleaned.quellen : [];
+
+  // Map cleaned result to form fields
   const data = {};
-  for (const [key, value] of Object.entries(parsed)) {
-    if (key === "spiA1_ids" && Array.isArray(value)) {
-      data.spiA1 = value;
-    } else if (key === "spiA2_ids" && Array.isArray(value)) {
-      data.spiA2 = value;
-    } else if (key === "quellen") {
-      // skip
+  for (const [key, value] of Object.entries(cleaned)) {
+    if (key === "quellen") continue; // skip quellen from form data
+
+    // Map lieferkette as structured object
+    if (key === "lieferkette" && value && typeof value === "object") {
+      data.lieferkette = value;
+      continue;
+    }
+
+    // Only set non-empty values
+    if (Array.isArray(value)) {
+      data[key] = value;
     } else if (value && value !== "") {
       data[key] = value;
     }

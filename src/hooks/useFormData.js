@@ -1,6 +1,6 @@
 import { useState, useCallback, useMemo } from "react";
 import { INITIAL_FORM_DATA } from "../constants/formDefaults";
-import { berechneErgebnis } from "../logic/prueflogik";
+import { nis2Pruefung } from "../logic/prueflogik";
 
 export function useFormData() {
   const [data, setData] = useState(INITIAL_FORM_DATA);
@@ -28,7 +28,12 @@ export function useFormData() {
         const updated = { ...prev };
         for (const [key, value] of Object.entries(partial)) {
           if (key in prev && value !== undefined) {
-            updated[key] = value;
+            // Deep-merge lieferkette object
+            if (key === "lieferkette" && typeof value === "object" && typeof prev[key] === "object") {
+              updated[key] = { ...prev[key], ...value };
+            } else {
+              updated[key] = value;
+            }
           }
         }
         return updated;
@@ -36,7 +41,7 @@ export function useFormData() {
     []
   );
 
-  const result = useMemo(() => berechneErgebnis(data), [data]);
+  const result = useMemo(() => nis2Pruefung(data), [data]);
 
   return { data, setField, toggleArrayItem, mergeData, result };
 }

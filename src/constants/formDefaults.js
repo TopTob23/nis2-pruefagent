@@ -16,19 +16,19 @@ export const INITIAL_FORM_DATA = {
   konzernUmsatz: "",
   konzernBilanz: "",
   itUnabhaengig: "unbekannt",
-  spiA1: [],
-  spiA2: [],
+  spiA1_ids: [],
+  spiA2_ids: [],
   sondermerkmale: [],
   keinesSonder: false,
   zertifizierungen: "",
-  vorfaelle: "nein",
-  hinweise: "",
-  lieferbeziehung: "unbekannt",
-  lieferKunden: "",
-  lieferSektoren: "",
-  lieferAnforderungen: "nein",
-  lieferLeistung: "",
-  lieferZugriff: "nein",
+  // Lieferkette as structured object matching prueflogik.js input
+  lieferkette: {
+    hatBeziehung: "unbekannt",
+    kundenSektoren: [],
+    artLeistung: "",
+    itZugriff: "nein",
+    vertraglicheAnforderungen: "",
+  },
 };
 
 export const STEP_LABELS = [
